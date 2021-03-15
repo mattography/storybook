@@ -1,21 +1,42 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import './button.css';
 
-/**
- * Primary UI component for user interaction
- */
-export const Button = ({ primary, backgroundColor, size, label, ...props }) => {
+export const Button = ({ primary, backgroundColor, size, label }) => {
+  const [copyIsAvailable, setCopyIsAvailable] = useState(true);
+  const baseUrl = window.location.href + "#";
+  const copyToClipBoard = async copyHeader => {
+    try {
+      await navigator.clipboard.writeText(copyHeader);
+    } catch(err) {
+      console.log("Could not copy to clipboard", err);
+    }
+  };
+
+  useEffect(() => {
+    setTimeout(() => {
+      setCopyIsAvailable(true);
+    }, 3000);
+  }, [copyIsAvailable])
   const mode = primary ? 'storybook-button--primary' : 'storybook-button--secondary';
   return (
+    <div>
     <button
+      onClick={() => setCopyIsAvailable(false)}
       type="button"
       className={['storybook-button', `storybook-button--${size}`, mode].join(' ')}
       style={backgroundColor && { backgroundColor }}
-      {...props}
+      // {...props}
     >
+    {copyIsAvailable ? (
+      <span name="linked" onClick={() => copyToClipBoard(baseUrl)}>
       {label}
+      </span>
+    ) : (
+      <span>Copied to clipboard</span>
+    )}
     </button>
+    </div>
   );
 };
 
